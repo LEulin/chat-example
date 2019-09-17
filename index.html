@@ -9,68 +9,70 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
   <title>Online Chat</title>
-  <div class="jumbotron">
-    <center>
-        <h1>CHAT TA BAI!!! :)</h1>
-    </center>
-  </div>
 </head>
 
 <style>
-.jumbotron{
-  padding: 20px;
-  color:black;
-  background-color: pink;
-}
+  body{
+    margin-top: 20px;
+  }
 .card{
   border: dotted black;
   width: 500px;
+  background: linear-gradient(to bottom, #ffffff 0%, #ffcccc 100%);
+  margin-top: 0%;
 }
 .form-control{
   width:300px;
 }
+img{
+  width: 200px;
+  height: 150px;
+}
+
 
 </style>
 
 <body>
-        <center>
-          <div class="card">
-            <br>
-              <div id="change_username" class="form-group">
-                <input id="username" type="text" class="form-control" />
-                <br>
-                <button id="btnUsername" class="btn btn-outline-primary" type="button">USERNAME</button>
-              </div>
-            <br>
-            <br>
+  <center>
+  <div class="card">
+    <img src="http://www.starwebmaker.com/images/chating.png">
+    <hr>
+    <div id="change_username" class="form-group">
+      <input id="username" type="text" class="form-control" />
+      <br>
+      <button id="btnUsername" class="btn btn-outline-primary" type="button">USERNAME</button>
+    </div>
+    <br>
+    <br>
+    <section id="input_zone">
+      <input id="message" class="form-control" type="text" />
+      <br>
+      <button id="btnMessage" class="btn btn-outline-danger" type="button">SEND</button>
+      <br>
+      <br>
+    </section>
+  </div>
+  </center>
+  </div>
+  <br>
+  <center>
+    <div class="card">
+      <header>
+        <h1>Message Box</h1>
+      </header>
 
-            <section id="input_zone">
-              <input id="message" class="form-control" type="text" />
-              <br>
-              <button id="btnMessage" class="btn btn-outline-danger" type="button">Send</button>
-              <br>
-              <br>
-            </section>
-          </div>
-        </center>
-        <br>
-        <center>
-            <div class="card">
-                <header>
-                  <h1>Received Message</h1>
-                </header>
-    
-                <section id="messagebox">
-                  <section id="feedback"></section>
-                </section>
-            </div>
-        </center>
+      <section id="messagebox">
+        <hr>
+        <section id="feedback"></section>
+      </section>
+    </div>
+  </center>
 
   <script src="http://code.jquery.com/jquery-latest.min.js"></script>
 
   <script>
     $(function () {
-      var socket = io.connect('http://localhost:3000')
+      var socket = io.connect('http://localhost:8080')
 
       var message = $("#message")
       var username = $("#username")
@@ -79,33 +81,33 @@
       var messagebox = $("#messagebox")
       var feedback = $("#feedback")
 
-      //Emit message
+      //creating message
       btnMessage.click(function () {
         socket.emit('new_message', {
           message: message.val()
         })
       })
 
-      // //Listen on new_message
-      // socket.on("new_message", (data) => {
-      //   feedback.html('');
-      //   message.val('');
-      //   messagebox.append("<p class='message'>" + data.username + ": " + data.message + "</p>")
-      // })
+      //appending a new_message
+      socket.on("new_message", (data) => {
+        feedback.html('');
+        message.val('');
+        messagebox.append("<p class='message'>" + data.username + ": " + data.message + "</p>")
+      })
 
-      //Emit a username
+      //changing a username
       btnUsername.click(function () {
         socket.emit('change_username', {
           username: username.val()
         })
-      })
+      });
 
       //Emit typing
       message.bind("keypress", () => {
         socket.emit('typing')
       })
 
-      //Listen on typing
+      //typing
       socket.on('typing', (data) => {
         feedback.html("<p><i>" + data.username + " is typing a message..." + "</i></p>")
       })

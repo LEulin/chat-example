@@ -1,7 +1,7 @@
 var app = require('express')();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
-var port = process.env.PORT || 3000;
+var port = process.env.PORT || 8080;
 
 
 app.get('/', function (req, res) {
@@ -9,11 +9,12 @@ app.get('/', function (req, res) {
 });
 
 io.on('connection', function (socket) {
-  socket.on('chat message', function (msg) {
-    io.emit('chat message', msg);
+  socket.on('chat_message', function (msg) {
+    io.emit('chat_message', msg);
     console.log(msg)
   });
 });
+
 
 http.listen(port, function () {
   console.log('listening on *:' + port);
@@ -22,26 +23,26 @@ http.listen(port, function () {
 
 var numUsers = 0;
 
-//listen on every connection
+//every connection
 io.on('connection', (socket) => {
   console.log('New user connected')
   var addedUser = false;
   //default username
-  socket.username = "Undefined"
+  socket.username = "Anonymous"
 
-  //listen on change_username
+  //change username
   socket.on('change_username', (data) => {
     socket.username = data.username
     console.log(socket.username)
   })
 
-  //listen on new_message
+  //new message
   socket.on('new_message', (data) => {
-    //broadcast the new message
+    //broadcasting the new message
     io.sockets.emit('new_message', { message: data.message, username: socket.username });
   })
 
-  //listen on typing
+  //typing
   socket.on('typing', (data) => {
     socket.broadcast.emit('typing', { username: socket.username })
   })
@@ -49,7 +50,7 @@ io.on('connection', (socket) => {
   socket.on('add user', (username) => {
     if (addedUser) return;
 
-    // we store the username in the socket session for this client
+    // storing username
     socket.username = username;
     ++numUsers;
     addedUser = true;
@@ -57,7 +58,7 @@ io.on('connection', (socket) => {
       numUsers: numUsers
     })
 
-    // echo globally (all clients) that a person has connected
+    //global connection
     socket.broadcast.emit('user joined', {
       username: socket.username,
       numUsers: numUsers

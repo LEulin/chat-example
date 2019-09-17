@@ -4,7 +4,8 @@
   "description": "my first socket.io app",
   "dependencies": {
     "express": "^4.15.2",
-    "socket.io": "^1.7.4"
+    "socket.io": "^1.7.4",
+    "sweetalert": "^2.1.2"
   },
   "scripts": {
     "start": "node index.js"
