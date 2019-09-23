@@ -46,7 +46,7 @@ io.on('connection', (socket) => {
   socket.on('typing', (data) => {
     socket.broadcast.emit('typing', { username: socket.username })
   })
-
+  //adding connected new usernames
   socket.on('add user', (username) => {
     if (addedUser) return;
 

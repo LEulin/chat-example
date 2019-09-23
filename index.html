@@ -12,9 +12,10 @@
 </head>
 
 <style>
-  body{
-    margin-top: 20px;
-  }
+  .jumbotron{
+  padding: 0%;
+  background: linear-gradient(to bottom, #ffffff 0%, #ffcccc 100%);
+}
 .card{
   border: dotted black;
   width: 500px;
@@ -28,33 +29,35 @@ img{
   width: 200px;
   height: 150px;
 }
+.form-group1{
+  position: absolute;
+  left: 1080px;
+ bottom: 480px;
+}
+#username{
+  width: 200px;
+  border:dotted pink;
+}
 
 
 </style>
 
 <body>
-  <center>
-  <div class="card">
-    <img src="http://www.starwebmaker.com/images/chating.png">
-    <hr>
-    <div id="change_username" class="form-group">
+  <div class="jumbotron">
+    <center>
+      <img src="http://www.starwebmaker.com/images/chating.png">
+      <hr>
+    </center>
+  </div>
+  <div class="card1">
+    <br>
+    <div id="change_username" class="form-group1">
       <input id="username" type="text" class="form-control" />
       <br>
-      <button id="btnUsername" class="btn btn-outline-primary" type="button">USERNAME</button>
+      <center><button id="btnUsername" class="btn btn-outline-primary" type="button">USERNAME</button></center>
+      <br>
     </div>
-    <br>
-    <br>
-    <section id="input_zone">
-      <input id="message" class="form-control" type="text" />
-      <br>
-      <button id="btnMessage" class="btn btn-outline-danger" type="button">SEND</button>
-      <br>
-      <br>
-    </section>
   </div>
-  </center>
-  </div>
-  <br>
   <center>
     <div class="card">
       <header>
@@ -67,6 +70,19 @@ img{
       </section>
     </div>
   </center>
+  <br>
+  <center>
+    <div class="card">
+      <br>
+      <section id="input_zone">
+        <input id="message" class="form-control" type="text" />
+        <br>
+        <button id="btnMessage" class="btn btn-outline-danger" type="button">SEND</button>
+      </section>
+      <br>
+    </div>
+  </center>
+  </div>
 
   <script src="http://code.jquery.com/jquery-latest.min.js"></script>
 
