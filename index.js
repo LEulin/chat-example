@@ -3,6 +3,7 @@ var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var port = process.env.PORT || 8080;
 
+var list_users = {};
 
 app.get('/', function (req, res) {
   res.sendFile(__dirname + '/index.html');
@@ -33,8 +34,27 @@ io.on('connection', (socket) => {
   //change username
   socket.on('change_username', (data) => {
     socket.username = data.username
-    console.log(socket.username)
+    if (!list_users.hasOwnProperty(data)) {
+      socket.username = data.username;
+      list_users[socket.username] = { online: true };
+      console.log('a user connected ' + socket.username);
+      io.sockets.emit('change_username', list_users);
+      console.log(socket.username)
+      console.log(list_users);
+    }
   })
+
+  socket.on('disconnect', function () {
+    if (!socket.username) {
+      return;
+    }
+    list_users[socket.username].online=false;
+    io.sockets.emit('change_username', list_users);
+    console.log(list_users);
+    console.log('user disconnected ' + socket.username);
+  });
+
+
 
   //new message
   socket.on('new_message', (data) => {
@@ -65,5 +85,5 @@ io.on('connection', (socket) => {
     });
     console.log(numUsers);
   })
-  
+
 })

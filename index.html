@@ -2,16 +2,20 @@
 <html>
 
 <head>
-  <meta http-equiv="Content-Type" const="text/html;charset=UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js"></script>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
   <title>Online Chat</title>
 </head>
 
 <style>
+  body{
+    margin-top: 2px;
+  }
   .jumbotron{
   padding: 0%;
   background: linear-gradient(to bottom, #ffffff 0%, #ffcccc 100%);
@@ -19,8 +23,7 @@
 .card{
   border: dotted black;
   width: 500px;
-  background: linear-gradient(to bottom, #ffffff 0%, #ffcccc 100%);
-  margin-top: 0%;
+  background: linear-gradient(to bottom, #ffffff 0%, #ffcccc 100%); 
 }
 .form-control{
   width:300px;
@@ -32,11 +35,31 @@ img{
 .form-group1{
   position: absolute;
   left: 1080px;
- bottom: 480px;
+  bottom: 480px;
 }
 #username{
   width: 200px;
   border:dotted pink;
+}
+
+#active_user{
+  position: absolute;
+  left: 20px;
+  top: 200px;
+  width: 150px;
+  background: linear-gradient(to bottom, #ffffff 0%, #ffcccc 100%);
+  bottom: 300px;
+  overflow-y: auto;
+  height: 250px;
+}
+
+#messagebox{
+  overflow-y: auto;
+  height: 180px;
+}
+li{
+  font-family: italic;
+  color: palevioletred;
 }
 
 
@@ -46,8 +69,12 @@ img{
   <div class="jumbotron">
     <center>
       <img src="http://www.starwebmaker.com/images/chating.png">
-      <hr>
     </center>
+  </div>
+  <div class="card" id="active_user">
+    <p style="color: black ; font-family: Verdana, Geneva, Tahoma, sans-serif">&nbsp;&nbsp;Online Users:</p>
+    <hr>
+    <ul id="online_list"></ul>
   </div>
   <div class="card1">
     <br>
@@ -108,7 +135,7 @@ img{
       socket.on("new_message", (data) => {
         feedback.html('');
         message.val('');
-        messagebox.append("<p class='message'>" + data.username + ": " + data.message + "</p>")
+        messagebox.append("<p class='message' style=background-color:skyblue>" + data.username + ": " + data.message + "</p>")
       })
 
       //changing a username
@@ -126,6 +153,19 @@ img{
       //typing
       socket.on('typing', (data) => {
         feedback.html("<p><i>" + data.username + " is typing a message..." + "</i></p>")
+      })
+
+      socket.on('change_username', function (data) {
+        $('#online_list').empty();
+        for (var user in data) {
+          var user_online = data[user].online
+          if (user_online) {
+            $('#online_list').append("<li id='online'>" + '<p style="color:green">' + user + '</p>' + "</li>");
+          }
+          else {
+            $('#online_list').append("<li id='offline'>" + '<p style="color:black">' + user + '</p>' + "</li>");
+          }
+        }
       })
     });
   </script>
