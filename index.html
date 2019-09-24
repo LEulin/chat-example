@@ -32,13 +32,14 @@ img{
   width: 200px;
   height: 150px;
 }
-.form-group1{
+/* #uname{
   position: absolute;
-  left: 1080px;
-  bottom: 480px;
-}
-#username{
   width: 200px;
+  left: 900px;
+  bottom: 510px;
+} */
+#username{
+  width: 180px;
   border:dotted pink;
 }
 
@@ -55,120 +56,157 @@ img{
 
 #messagebox{
   overflow-y: auto;
-  height: 180px;
+  height: 200px;
 }
 li{
   font-family: italic;
   color: palevioletred;
 }
+.modal fade{
+  text-align: center;
+  width: 80px;
+} 
 
+#online{
+  color: green;
+}
 
+#offline{
+  color: grey;
+}
 </style>
 
 <body>
   <div class="jumbotron">
     <center>
       <img src="http://www.starwebmaker.com/images/chating.png">
+      <br>
+      <button type="button" id="modalUname" class="btn btn-info" data-toggle="modal" data-target="#change_username">Username</button>
     </center>
   </div>
+
   <div class="card" id="active_user">
     <p style="color: black ; font-family: Verdana, Geneva, Tahoma, sans-serif">&nbsp;&nbsp;Online Users:</p>
     <hr>
     <ul id="online_list"></ul>
   </div>
-  <div class="card1">
-    <br>
-    <div id="change_username" class="form-group1">
-      <input id="username" type="text" class="form-control" />
-      <br>
-      <center><button id="btnUsername" class="btn btn-outline-primary" type="button">USERNAME</button></center>
-      <br>
+
+  <!-- modal for username -->
+  <!-- Modal -->
+  <div class="modal fade" id="change_username" role="dialog">
+      <div class="modal-dialog modal-sm">
+
+      <!-- Modal content-->
+      <div class="modal-content">
+            <center>
+                <h1>Username</h1>
+            <hr>
+          <div id="change_username" class="form-group">
+            <input id="username" type="text" class="form-control" />
+            <br>
+            <button id="btnUsername" class="btn btn-outline-info" type="button" data-dismiss="modal">USERNAME</button>
+            <br>
+          </div>
+        </center>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
-  <center>
-    <div class="card">
-      <header>
-        <h1>Message Box</h1>
-      </header>
+      <center>
+        <div class="card">
+          <header>
+            <h1>Message Box</h1>
+          </header>
 
-      <section id="messagebox">
-        <hr>
-        <section id="feedback"></section>
-      </section>
-    </div>
-  </center>
-  <br>
-  <center>
-    <div class="card">
+          <section id="messagebox">
+            <hr>
+            <section id="feedback"></section>
+          </section>
+        </div>
+      </center>
       <br>
-      <section id="input_zone">
-        <input id="message" class="form-control" type="text" />
-        <br>
-        <button id="btnMessage" class="btn btn-outline-danger" type="button">SEND</button>
-      </section>
-      <br>
+      <center>
+        <div class="card">
+          <br>
+          <section id="input_zone">
+            <input id="message" class="form-control" type="text" />
+            <br>
+            <button id="btnMessage" class="btn btn-outline-danger" type="button">SEND</button>
+          </section>
+          <br>
+        </div>
+      </center>
     </div>
-  </center>
-  </div>
 
-  <script src="http://code.jquery.com/jquery-latest.min.js"></script>
+    <script src="http://code.jquery.com/jquery-latest.min.js"></script>
 
-  <script>
-    $(function () {
-      var socket = io.connect('http://localhost:8080')
+    <script>
+      $(function () {
+        var socket = io.connect('http://localhost:8080')
 
-      var message = $("#message")
-      var username = $("#username")
-      var btnMessage = $("#btnMessage")
-      var btnUsername = $("#btnUsername")
-      var messagebox = $("#messagebox")
-      var feedback = $("#feedback")
+        var message = $("#message")
+        var username = $("#username")
+        var btnMessage = $("#btnMessage")
+        var btnUsername = $("#btnUsername")
+        var messagebox = $("#messagebox")
+        var feedback = $("#feedback")
 
-      //creating message
-      btnMessage.click(function () {
-        socket.emit('new_message', {
-          message: message.val()
+        //creating message
+        btnMessage.click(function () {
+          socket.emit('new_message', {
+            message: message.val()
+          })
         })
-      })
 
-      //appending a new_message
-      socket.on("new_message", (data) => {
-        feedback.html('');
-        message.val('');
-        messagebox.append("<p class='message' style=background-color:skyblue>" + data.username + ": " + data.message + "</p>")
-      })
+        //appending a new_message
+        socket.on("new_message", (data) => {
+          feedback.html('');
+          message.val('');
+          if (data.username == $('#username').val()) {
+            messagebox.append($('<p class="right" style="background-color:skyblue;border-radius: 25px;width:200px; margin-left: 50% "</p>').text(data.username + " : " + data.message));
+          } else {
+            messagebox.append($('<p class="left" style="background-color:grey;border-radius: 25px;width:200px; margin-right: 50%"</p>').text(data.username + " : " + data.message));
+          }
+          window.scrollTo(0, document.body.scrollHeight);
+        })
+        socket.on('chat message', function (msg) {
+          let name = msg.split(":")
+          console.log(name)
 
-      //changing a username
-      btnUsername.click(function () {
-        socket.emit('change_username', {
-          username: username.val()
+        });
+
+        //changing a username
+        btnUsername.click(function () {
+          socket.emit('change_username', {
+            username: username.val()
+          })
+        });
+
+        //Emit typing
+        message.bind("keypress", () => {
+          socket.emit('typing')
+        })
+
+        //typing
+        socket.on('typing', (data) => {
+          feedback.html("<p><i>" + data.username + " is typing a message..." + "</i></p>")
+        })
+
+        socket.on('change_username', function (data) {
+          $('#online_list').empty();
+          for (var user in data) {
+            var user_online = data[user].online
+            if (user_online) {
+              $('#online_list').append("<li id='online'>" + '<p style="color:black">' + user + '</p>' + "</li>");
+            }
+            else {
+              $('#online_list').append("<li id='offline'>" + '<p style="color:black">' + user + '</p>' + "</li>");
+            }
+          }
         })
       });
-
-      //Emit typing
-      message.bind("keypress", () => {
-        socket.emit('typing')
-      })
-
-      //typing
-      socket.on('typing', (data) => {
-        feedback.html("<p><i>" + data.username + " is typing a message..." + "</i></p>")
-      })
-
-      socket.on('change_username', function (data) {
-        $('#online_list').empty();
-        for (var user in data) {
-          var user_online = data[user].online
-          if (user_online) {
-            $('#online_list').append("<li id='online'>" + '<p style="color:green">' + user + '</p>' + "</li>");
-          }
-          else {
-            $('#online_list').append("<li id='offline'>" + '<p style="color:black">' + user + '</p>' + "</li>");
-          }
-        }
-      })
-    });
-  </script>
+    </script>
 </body>
 
 </html>
